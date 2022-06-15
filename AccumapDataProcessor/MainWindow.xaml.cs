@@ -14,6 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Configuration;
+using AccumapDataProcessor.Stores;
+using AccumapDataProcessor.Utils;
+using Microsoft.Win32;
 
 namespace AccumapDataProcessor
 {
@@ -27,35 +30,24 @@ namespace AccumapDataProcessor
             InitializeComponent();
         }
 
-        public static int buttonCount = 0;
 
-        private void testButton_Click(object sender, RoutedEventArgs e)
-        {
+        private void testButton_Click(object sender, RoutedEventArgs e) {
+            
+            // Get the File Name
+            var ofd = new OpenFileDialog();
+            var filePath = ofd.ShowDialog();
+            if (filePath == false) return;
+            Display.Text = ofd.FileName;
+            
+            //Convert the locations to a string for sql list. 
+            var locationList = CsvUtils.ConvertUwiFromCsvToSqlString(ofd.FileName);
 
-            string synapse = ConfigurationManager.ConnectionStrings["Synapse"].ConnectionString;
 
-            var context = new AZUPSQLP01Context();
+            var wellList = AccumapUtils.GetWells(locationList);
 
-            var well = (from c in context.TIhsWells
-                        where c.Uwi.Contains("103132704204W400")
-                        select c).First();
+            Console.WriteLine(wellList);
 
-       
 
-            if (null != well)
-            {
-                var businessAssociate =
-                    (from ba in context.TIhsBusinessAssociates
-                    where ba.BusinessAssociate == well.Operator
-                    select ba).First();
-
-                if(null != businessAssociate)
-                {
-                    buttonCount++;
-                    Display.Text = businessAssociate.BaName?.ToString();
-                    Display.Text = buttonCount.ToString();
-                }
-            }
+          }
         }
     }
-}
