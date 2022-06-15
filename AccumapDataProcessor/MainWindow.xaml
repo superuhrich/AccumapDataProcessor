@@ -86,8 +86,18 @@
 
 
         <TextBlock Grid.Column="1" Grid.Row="1" FontSize="36" Text="Accumap Data Thing" Grid.ColumnSpan="2"></TextBlock>
-        <Button Style="{DynamicResource ButtonStyle1}" x:Name="testButton" Content="Test" Grid.Column="1" Grid.Row="2" Margin="2" Click="testButton_Click"/>
+        <Button Style="{DynamicResource ButtonStyle1}" x:Name="GetWellListButton" Content="Select Well List" Grid.Column="1" Grid.Row="2" Margin="2" Click="GetWellListButton_Click"/>
         <TextBlock Grid.Column="1" Grid.Row="3" FontSize="12" Grid.ColumnSpan="3" x:Name="Display"/>
+        <ListView Name="wellListGrid" Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="7">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Operator" DisplayMemberBinding="{Binding BaName}"/>
+                    <GridViewColumn Header="UWI" DisplayMemberBinding="{Binding XUwiDisplay}"/>
+                    <GridViewColumn Header="On Production Date" DisplayMemberBinding="{Binding XOnprodDate}"/>
+                    <GridViewColumn Header="Interaction Status" DisplayMemberBinding="{Binding PcInteractionStatus}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
 
     </Grid>
 </Window>

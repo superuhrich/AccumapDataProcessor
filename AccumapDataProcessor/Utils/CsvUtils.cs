@@ -20,7 +20,7 @@ public static class CsvUtils {
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    public static string ConvertUwiFromCsvToSqlString(string filePath) {
+    public static List<string> ConvertUwiFromCsvToSqlString(string filePath) {
         // Get the list from the CSV
         var locationList = File.ReadAllLines(filePath, Encoding.UTF8);
         
@@ -31,20 +31,8 @@ public static class CsvUtils {
             // Add 1 at the beginning
             locationList[i] = locationList[i].Insert(0, "1");
         }
-        
-        if (!locationList.Any()) {
-            MessageBox.Show("Please select a file with more than 0 UWI's");
-            return "";
-        }
-        else {
-            var locationString = "";
-            foreach (var location in locationList) {
-                locationString = locationString + $"\'{location}\',";
-            }
-            //Remove the last comma
-            locationString = locationString.Remove(locationString.Length - 1, 1);
-            return locationString;
-        }
+        return locationList.ToList();
+
     }
 }
 

@@ -25,24 +25,24 @@ namespace AccumapDataProcessor.Stores
         /// Method to get well level details from a list of UWI's. 
         /// </summary>
         /// <returns></returns>
-        public static List<Well> GetWells(string locationList) {
+        public static async Task<List<Well>> GetWells(List<string> locationList) {
             // The query string
             var sql = @"
-            select TOP (100)
+            select
             w.*,
             ba.*
             from [stage].[t_ihs_well] w
             join [stage].[t_ihs_business_associate] ba on (w.[OPERATOR] = ba.[BUSINESS_ASSOCIATE])
-            where UWI in (@UwiList)";
+            where UWI in @locationList";
 
             // The tables in synapse are snake string,  while classes are upper camel case. 
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             // Make the query
-            var wellList = conn.Query<Well>(sql, new {UwiList =  new string[] {"102162704814W500"}}).ToList();
+            var wellList = await conn.QueryAsync<Well>(sql, new {locationList});
             
             //Return it
-            return wellList;
+            return wellList.ToList();
 
         }
     }

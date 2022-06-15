@@ -31,7 +31,7 @@ namespace AccumapDataProcessor
         }
 
 
-        private void testButton_Click(object sender, RoutedEventArgs e) {
+        private async void GetWellListButton_Click(object sender, RoutedEventArgs e) {
             
             // Get the File Name
             var ofd = new OpenFileDialog();
@@ -42,8 +42,13 @@ namespace AccumapDataProcessor
             //Convert the locations to a string for sql list. 
             var locationList = CsvUtils.ConvertUwiFromCsvToSqlString(ofd.FileName);
 
-
-            var wellList = AccumapUtils.GetWells(locationList);
+            // Get the details from Accumap Synapse
+            var wellList = await AccumapUtils.GetWells(locationList);
+            
+            // Determine the interaction status
+            GeoUtils.DetermineParentChildStatus(wellList);
+            
+            wellListGrid.ItemsSource = wellList;
 
             Console.WriteLine(wellList);
 
