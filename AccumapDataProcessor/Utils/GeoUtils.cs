@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using AccumapDataProcessor.DapperModels;
 using AccumapDataProcessor.Models;
-using Geolocation;
+using BAMCIS;
+using BAMCIS.GIS;
 using Well = AccumapDataProcessor.DapperModels.Well;
 
 namespace AccumapDataProcessor.Utils; 
@@ -23,30 +24,30 @@ public static class GeoUtils {
             // Make sure we have lat and long for the well we are looking at
             if (wellList[i].BottomHoleLatitude != null && wellList[i].BottomHoleLongitude != null && wellList[i].SurfaceLatitude != null && wellList[i].SurfaceLongitude != null) {
                 //Get a coordinate for the well we are analysing
-                var originBhCoordinate = new Coordinate((double)wellList[i].BottomHoleLatitude, (double)wellList[i].BottomHoleLongitude);
-                var originSurCoordinate = new Coordinate((double)wellList[i].SurfaceLatitude,
+                var originBhCoordinate = new GeoCoordinate((double)wellList[i].BottomHoleLatitude, (double)wellList[i].BottomHoleLongitude);
+                var originSurCoordinate = new GeoCoordinate((double)wellList[i].SurfaceLatitude,
                     (double)wellList[i].SurfaceLongitude);
                 // Get the well bearing 
-                var originWellBearing = GeoCalculator.GetBearing(originSurCoordinate, originBhCoordinate);
+                var originWellBearing = originSurCoordinate.InitialBearingTo(originBhCoordinate);
 
                 foreach (var offset in wellList) {
                     // Make sure we have a lat and long for each of these as well
                     if (offset.BottomHoleLatitude != null && offset.BottomHoleLongitude != null && offset.SurfaceLatitude != null && offset.SurfaceLongitude!= null) {
                         //Make a coordinate for the offset
-                        var offsetBhCoordingate = new Coordinate((double)offset.BottomHoleLatitude,
+                        var offsetBhCoordingate = new GeoCoordinate((double)offset.BottomHoleLatitude,
                             (double)offset.BottomHoleLongitude);
-                        var offsetSurCoordinate = new Coordinate((double)offset.SurfaceLatitude,
+                        var offsetSurCoordinate = new GeoCoordinate((double)offset.SurfaceLatitude,
                             (double)offset.SurfaceLongitude);
                         // Get the offset Bearing
-                        var offsetWellBearing = GeoCalculator.GetBearing(offsetSurCoordinate, offsetBhCoordingate);
+                        var offsetWellBearing = offsetSurCoordinate.InitialBearingTo(offsetBhCoordingate);
                         
                         //Determine the distance between them and add them to a list
                         var offsetDistanceList = new List<double>();
 
-                        offsetDistanceList.Add(GeoCalculator.GetDistance(originBhCoordinate, offsetBhCoordingate, 1, DistanceUnit.Meters));
-                        offsetDistanceList.Add(GeoCalculator.GetDistance(originSurCoordinate, offsetBhCoordingate, 1, DistanceUnit.Meters));
-                        offsetDistanceList.Add(GeoCalculator.GetDistance(originBhCoordinate, offsetSurCoordinate, 1, DistanceUnit.Meters));
-                        offsetDistanceList.Add(GeoCalculator.GetDistance(originSurCoordinate, offsetSurCoordinate, 1, DistanceUnit.Meters));
+                        offsetDistanceList.Add( originBhCoordinate.DistanceTo(offsetBhCoordingate, DistanceType.METERS));
+                        offsetDistanceList.Add(originSurCoordinate.DistanceTo(offsetBhCoordingate, DistanceType.METERS));
+                        offsetDistanceList.Add(originBhCoordinate.DistanceTo(offsetSurCoordinate,  DistanceType.METERS));
+                        offsetDistanceList.Add(originSurCoordinate.DistanceTo(offsetSurCoordinate, DistanceType.METERS));
                         
                         // Find the minimum of all the distances, since we dont really have offset envelopes with Accumap Data
                         var interwellSpacing = offsetDistanceList.Min();
