@@ -41,7 +41,7 @@ namespace AccumapDataProcessor.DapperModels
         public string? XUwiDisplay { get; set; }
         public decimal? XTdTvd { get; set; }
         public decimal? XLateralLength { get; set; }
-        public InteractionStatus PcInteractionStatus { get; set; } = InteractionStatus.None;
+        public InteractionStatus PcInteractionStatus { get; set; } = InteractionStatus.Parent;
     }
 
     public enum InteractionStatus {
